@@ -1,0 +1,14 @@
+{
+  "name": "It's forthe birds",
+  "version": "1.0.0",
+  "description": "Intel Edison IoT BirdFeeder",
+  "main": "index.js",
+  "dependencies": {
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Wai Lun Poon",
+  "license": "MIT"
+}

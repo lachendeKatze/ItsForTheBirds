@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bird Feeder 101</title>
+    <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.5.0.js"></script>
+    <script type="text/javascript" src="https://pubnub.github.io/eon/v/eon/1.0.0/eon.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://pubnub.github.io/eon/v/eon/1.0.0/eon.css" />
+ <style type="text/css">
+    html {
+      background: AliceBlue no-repeat center center fixed;
+      -webkit-background-size: cover;
+      -moz-background-size: cover;
+      -o-background-size: cover;
+      background-size: cover;
+    }
+  .flex-container {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-flow: row wrap;
+    flex-flow: row wrap;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .flex-container > * {
+      padding: 10px;
+      flex: 1 100%;
+  }
+
+  .main {
+      text-align: center;
+      background: AliceBlue;
+  }
+
+  .header {
+    background: AliceBlue;
+    font-family: "Comic Sans MS";
+    font-size: 60px;
+  }
+  .footer {background: AliceBlue;}
+  .aside1 {background: AliceBlue;}
+  .aside2 {background: AliceBlue;}
+
+  @media all and (min-width: 600px) {
+      .aside { flex: 1 auto; }
+  }
+
+  @media all and (min-width: 600px) {
+      .main    { flex: 7 0px; }
+      .aside1 { order: 1; }
+      .main    { order: 2; }
+      .aside2 { order: 3; }
+      .footer  { order: 4; }
+  }
+ </style>
+</head>
+
+<body>
+  <div class="flex-container">
+    <header class="header">
+      <p> It's For The Birds! </p>
+    </header>
+    <article class="main">
+        <div id="perch"></div>
+    </article>
+    <aside class="aside aside1">
+        <div id="feed"></div>
+    </aside>
+    <aside class="aside aside2">
+      <div id="enviro"></div>
+    </aside>
+    <footer class="footer">
+      <img id="myImage0" src="bluebird.png"  width="300" height="200" alt="flew the coop">
+      <img id="myImage1" src="bluebird.png"  width="300" height="200" alt="flew the coop">
+      <img id="myImage2" src="bluebird.png"  width="300" height="200" alt="flew the coop">
+    </footer>
+  </div>
+
+<script type="text/javascript">
+var pubnub = new PubNub({
+    subscribeKey : "your subscribe key here",
+});
+
+// subscride to the feederview channel here
+pubnub.subscribe({channels: ['feederView']});
+
+// decode the JSON payload whenever new images come through
+pubnub.addListener({
+  message: function(m){
+    var msg = m.message;
+    var chan = m.channel;
+    // console.log(JSON.stringify(msg));
+    console.log(chan);
+    var theURLMSG = JSON.parse(JSON.stringify(msg));
+    console.log("This is it: " + theURLMSG["latestView"]);
+    console.log("The image index: " + theURLMSG["imageIndex"]);
+    var imageIndex = theURLMSG["imageIndex"];
+    if (theURLMSG.latestView != null) {
+      if (imageIndex=="0"){
+        document.getElementById("myImage0").src=theURLMSG["latestView"];
+      }
+      else if (imageIndex=="1") {
+        document.getElementById("myImage1").src=theURLMSG["latestView"];
+      }
+      else if (imageIndex=="2") {
+        document.getElementById("myImage2").src=theURLMSG["latestView"];
+      }
+    }
+  }
+});
+eon.chart({
+    pubnub: pubnub,
+    channels: ["feeder"],
+    generate: {
+        bindto: '#feed',
+        data: {
+            labels: true,
+            type:'gauge'
+          },
+          gauge: {
+            min: 0,
+            max: 500
+          },
+          color: {
+            pattern: ['#FF0000', '#F6C600', '#60B044'],
+            threshold: {
+              values: [50, 100, 450]
+            }
+          }
+        }
+});
+
+eon.chart({
+  pubnub: pubnub,
+  channels: ['environment'],
+  pubnub: pubnub,
+  generate: {
+    bindto: '#enviro',
+    data: {
+      labels: true,
+      type: 'bar'
+    },
+    bar: {
+      width: {
+        ratio: 0.5
+      }
+    },
+    tooltip: {
+        show: false
+    }
+  }
+});
+eon.chart({
+  pubnub: pubnub,
+  channels: ['perch'],
+  pubnub: pubnub,
+  generate: {
+    bindto: '#perch',
+    data: {
+      labels: true,
+      type: 'bar'
+    },
+    bar: {
+      width: {
+        ratio: 0.5
+      }
+    },
+    tooltip: {
+        show: false
+    }
+  }
+});
+</script>
+
+</body>
+</html>
